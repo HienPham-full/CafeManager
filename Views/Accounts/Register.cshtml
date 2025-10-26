@@ -1,0 +1,474 @@
+@{
+    ViewData["Title"] = "Đăng ký";
+    Layout = null;
+}
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewData["Title"] - CafeWeb</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .register-container {
+            background: white;
+            border-radius: 24px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+            width: 100%;
+            max-width: 480px;
+            animation: slideUp 0.5s ease-out;
+        }
+
+        @@keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .register-header {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            padding: 40px 40px 35px;
+            text-align: center;
+            color: white;
+        }
+
+        .register-header h1 {
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .register-header p {
+            font-size: 15px;
+            opacity: 0.95;
+            font-weight: 400;
+        }
+
+        .register-body {
+            padding: 40px;
+        }
+
+        .form-group {
+            margin-bottom: 22px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #334155;
+            font-size: 14px;
+        }
+
+        .form-group label .optional {
+            color: #94a3b8;
+            font-weight: 400;
+            font-size: 13px;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 14px 16px;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            font-size: 15px;
+            transition: all 0.3s ease;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: #f093fb;
+            box-shadow: 0 0 0 4px rgba(240, 147, 251, 0.1);
+        }
+
+        .form-control:hover {
+            border-color: #cbd5e1;
+        }
+
+        .password-strength {
+            margin-top: 8px;
+            height: 4px;
+            background: #e2e8f0;
+            border-radius: 2px;
+            overflow: hidden;
+            display: none;
+        }
+
+        .password-strength-bar {
+            height: 100%;
+            width: 0;
+            transition: all 0.3s ease;
+            border-radius: 2px;
+        }
+
+        .password-strength-text {
+            font-size: 12px;
+            margin-top: 6px;
+            font-weight: 500;
+        }
+
+        .btn-register {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 8px;
+        }
+
+        .btn-register:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(240, 147, 251, 0.4);
+        }
+
+        .btn-register:active {
+            transform: translateY(0);
+        }
+
+        .btn-register:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .alert {
+            padding: 14px 16px;
+            border-radius: 12px;
+            margin-bottom: 24px;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .alert-danger {
+            background-color: #fee2e2;
+            color: #dc2626;
+            border: 1px solid #fecaca;
+        }
+
+        .alert-success {
+            background-color: #d1fae5;
+            color: #059669;
+            border: 1px solid #a7f3d0;
+        }
+
+        .divider {
+            display: flex;
+            align-items: center;
+            margin: 28px 0;
+            color: #94a3b8;
+            font-size: 14px;
+        }
+
+        .divider::before,
+        .divider::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: #e2e8f0;
+        }
+
+        .divider span {
+            padding: 0 16px;
+        }
+
+        .login-link {
+            text-align: center;
+            margin-top: 24px;
+            font-size: 14px;
+            color: #64748b;
+        }
+
+        .login-link a {
+            color: #f093fb;
+            text-decoration: none;
+            font-weight: 600;
+            transition: color 0.3s ease;
+        }
+
+        .login-link a:hover {
+            color: #f5576c;
+        }
+
+        .password-toggle {
+            position: relative;
+        }
+
+        .password-toggle input {
+            padding-right: 50px;
+        }
+
+        .password-toggle-btn {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: #94a3b8;
+            cursor: pointer;
+            padding: 8px;
+            transition: color 0.3s ease;
+        }
+
+        .password-toggle-btn:hover {
+            color: #f093fb;
+        }
+
+        .password-match {
+            font-size: 12px;
+            margin-top: 6px;
+            font-weight: 500;
+            display: none;
+        }
+
+        .password-match.show {
+            display: block;
+        }
+
+        .password-match.match {
+            color: #059669;
+        }
+
+        .password-match.no-match {
+            color: #dc2626;
+        }
+
+        @@media (max-width: 480px) {
+            .register-container {
+                border-radius: 16px;
+            }
+
+            .register-header {
+                padding: 30px 24px 25px;
+            }
+
+            .register-header h1 {
+                font-size: 26px;
+            }
+
+            .register-body {
+                padding: 30px 24px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="register-container">
+        <div class="register-header">
+            <h1>☕ CafeWeb</h1>
+            <p>Tạo tài khoản mới</p>
+        </div>
+        <div class="register-body">
+            @if (ViewBag.Error != null)
+            {
+                <div class="alert alert-danger">
+                    @ViewBag.Error
+                </div>
+            }
+            @if (ViewBag.Success != null)
+            {
+                <div class="alert alert-success">
+                    @ViewBag.Success
+                </div>
+            }
+
+            <form action="/Accounts/Register" method="post" id="registerForm">
+                @Html.AntiForgeryToken()
+                
+                <div class="form-group">
+                    <label for="username">Tên đăng nhập</label>
+                    <input type="text" id="username" name="username" class="form-control" 
+                           placeholder="Nhập tên đăng nhập" required autofocus 
+                           pattern="[a-zA-Z0-9_]{3,}" 
+                           title="Tên đăng nhập phải có ít nhất 3 ký tự và chỉ chứa chữ, số, gạch dưới">
+                </div>
+
+                <div class="form-group">
+                    <label for="fullName">Họ và tên <span class="optional">(tùy chọn)</span></label>
+                    <input type="text" id="fullName" name="fullName" class="form-control" 
+                           placeholder="Nhập họ và tên">
+                </div>
+
+                <div class="form-group">
+                    <label for="password">Mật khẩu</label>
+                    <div class="password-toggle">
+                        <input type="password" id="password" name="password" class="form-control" 
+                               placeholder="Nhập mật khẩu (tối thiểu 6 ký tự)" required 
+                               minlength="6">
+                        <button type="button" class="password-toggle-btn" onclick="togglePassword('password')">
+                            👁️
+                        </button>
+                    </div>
+                    <div class="password-strength" id="passwordStrength">
+                        <div class="password-strength-bar" id="strengthBar"></div>
+                    </div>
+                    <div class="password-strength-text" id="strengthText"></div>
+                </div>
+
+                <div class="form-group">
+                    <label for="confirmPassword">Xác nhận mật khẩu</label>
+                    <div class="password-toggle">
+                        <input type="password" id="confirmPassword" name="confirmPassword" class="form-control" 
+                               placeholder="Nhập lại mật khẩu" required>
+                        <button type="button" class="password-toggle-btn" onclick="togglePassword('confirmPassword')">
+                            👁️
+                        </button>
+                    </div>
+                    <div class="password-match" id="passwordMatch"></div>
+                </div>
+
+                <button type="submit" class="btn-register" id="submitBtn">Đăng ký</button>
+            </form>
+
+            <div class="divider">
+                <span>hoặc</span>
+            </div>
+
+            <div class="login-link">
+                Đã có tài khoản? <a href="/Accounts/Login">Đăng nhập ngay</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function togglePassword(fieldId) {
+            const passwordInput = document.getElementById(fieldId);
+            const toggleBtn = passwordInput.parentElement.querySelector('.password-toggle-btn');
+            
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                toggleBtn.textContent = '🙈';
+            } else {
+                passwordInput.type = 'password';
+                toggleBtn.textContent = '👁️';
+            }
+        }
+
+        const passwordInput = document.getElementById('password');
+        const strengthBar = document.getElementById('strengthBar');
+        const strengthText = document.getElementById('strengthText');
+        const passwordStrengthDiv = document.getElementById('passwordStrength');
+
+        passwordInput.addEventListener('input', function() {
+            const password = this.value;
+            
+            if (password.length === 0) {
+                passwordStrengthDiv.style.display = 'none';
+                strengthText.textContent = '';
+                return;
+            }
+
+            passwordStrengthDiv.style.display = 'block';
+            
+            let strength = 0;
+            if (password.length >= 6) strength++;
+            if (password.length >= 10) strength++;
+            if (/[a-z]/.test(password) && /[A-Z]/.test(password)) strength++;
+            if (/\d/.test(password)) strength++;
+            if (/[^a-zA-Z0-9]/.test(password)) strength++;
+
+            const width = (strength / 5) * 100;
+            strengthBar.style.width = width + '%';
+
+            if (strength <= 2) {
+                strengthBar.style.background = '#ef4444';
+                strengthText.textContent = '⚠️ Mật khẩu yếu';
+                strengthText.style.color = '#ef4444';
+            } else if (strength <= 3) {
+                strengthBar.style.background = '#f59e0b';
+                strengthText.textContent = '⚡ Mật khẩu trung bình';
+                strengthText.style.color = '#f59e0b';
+            } else {
+                strengthBar.style.background = '#10b981';
+                strengthText.textContent = '✓ Mật khẩu mạnh';
+                strengthText.style.color = '#10b981';
+            }
+
+            checkPasswordMatch();
+        });
+
+        const confirmPasswordInput = document.getElementById('confirmPassword');
+        const passwordMatch = document.getElementById('passwordMatch');
+
+        function checkPasswordMatch() {
+            const password = passwordInput.value;
+            const confirmPassword = confirmPasswordInput.value;
+
+            if (confirmPassword.length === 0) {
+                passwordMatch.classList.remove('show');
+                return;
+            }
+
+            passwordMatch.classList.add('show');
+
+            if (password === confirmPassword) {
+                passwordMatch.textContent = '✓ Mật khẩu khớp';
+                passwordMatch.classList.remove('no-match');
+                passwordMatch.classList.add('match');
+            } else {
+                passwordMatch.textContent = '✗ Mật khẩu không khớp';
+                passwordMatch.classList.remove('match');
+                passwordMatch.classList.add('no-match');
+            }
+        }
+
+        confirmPasswordInput.addEventListener('input', checkPasswordMatch);
+
+        document.getElementById('registerForm').addEventListener('submit', function(e) {
+            const password = passwordInput.value;
+            const confirmPassword = confirmPasswordInput.value;
+
+            if (password !== confirmPassword) {
+                e.preventDefault();
+                alert('Mật khẩu xác nhận không khớp!');
+                return false;
+            }
+
+            if (password.length < 6) {
+                e.preventDefault();
+                alert('Mật khẩu phải có ít nhất 6 ký tự!');
+                return false;
+            }
+        });
+
+        setTimeout(function() {
+            const alerts = document.querySelectorAll('.alert');
+            alerts.forEach(alert => {
+                alert.style.transition = 'opacity 0.5s ease';
+                alert.style.opacity = '0';
+                setTimeout(() => alert.remove(), 500);
+            });
+        }, 5000);
+    </script>
+</body>
+</html>

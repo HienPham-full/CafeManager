@@ -1,0 +1,1191 @@
+@{
+    ViewData["Title"] = "Dashboard - Quản trị";
+    var username = Context.Session.GetString("Username") ?? "Admin";
+    var fullName = Context.Session.GetString("FullName") ?? "Quản trị viên";
+    var userId = Context.Session.GetInt32("UserId") ?? 1;
+}
+
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewData["Title"]</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @@keyframes gradient {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        
+        @@keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+        
+        @@keyframes pulse-glow {
+            0%, 100% { box-shadow: 0 0 20px rgba(139, 92, 246, 0.3); }
+            50% { box-shadow: 0 0 40px rgba(139, 92, 246, 0.6); }
+        }
+
+        @@keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @@keyframes slideUp {
+            from { 
+                opacity: 0;
+                transform: translateY(30px) scale(0.95);
+            }
+            to { 
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        @@keyframes slideIn {
+            from { transform: translateX(400px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        
+        @@keyframes slideOut {
+            from { transform: translateX(0); opacity: 1; }
+            to { transform: translateX(400px); opacity: 0; }
+        }
+
+        .gradient-bg {
+            background: linear-gradient(-45deg, #667eea, #764ba2, #f093fb, #4facfe);
+            background-size: 400% 400%;
+            animation: gradient 15s ease infinite;
+        }
+
+        .glass-effect {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .card-premium {
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card-premium::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            transition: left 0.5s;
+        }
+
+        .card-premium:hover::before {
+            left: 100%;
+        }
+
+        .card-premium:hover {
+            transform: translateY(-10px) scale(1.02);
+            box-shadow: 0 30px 60px -12px rgba(0, 0, 0, 0.25);
+        }
+
+        .menu-item {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .menu-item::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            height: 100%;
+            width: 4px;
+            background: linear-gradient(180deg, #667eea, #764ba2);
+            transform: scaleY(0);
+            transition: transform 0.3s;
+        }
+
+        .menu-item:hover::before,
+        .menu-item.active::before {
+            transform: scaleY(1);
+        }
+
+        .menu-item:hover,
+        .menu-item.active {
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.2), rgba(118, 75, 162, 0.2));
+            transform: translateX(8px);
+        }
+
+        .stat-icon {
+            animation: float 3s ease-in-out infinite;
+        }
+
+        .progress-bar {
+            transition: width 1s ease-in-out;
+        }
+
+        .dropdown-menu {
+            display: none;
+            opacity: 0;
+            transform: translateY(-10px);
+            transition: all 0.3s ease;
+        }
+
+        .dropdown-menu.show {
+            display: block;
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .table-row {
+            transition: all 0.2s ease;
+        }
+
+        .table-row:hover {
+            background: linear-gradient(90deg, rgba(102, 126, 234, 0.05), rgba(118, 75, 162, 0.05));
+            transform: scale(1.01);
+        }
+
+        .badge-pulse {
+            animation: pulse-glow 2s ease-in-out infinite;
+        }
+
+        .sidebar-premium {
+            background: linear-gradient(180deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            box-shadow: 5px 0 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .quick-action {
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .quick-action:hover {
+            transform: translateY(-5px) rotate(2deg);
+        }
+
+        .status-indicator {
+            position: relative;
+        }
+
+        .status-indicator::before {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border-radius: 9999px;
+            animation: pulse-ring 2s ease-out infinite;
+        }
+
+        @@keyframes pulse-ring {
+            0% { transform: scale(1); opacity: 0.8; }
+            100% { transform: scale(1.5); opacity: 0; }
+        }
+
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(8px);
+            z-index: 1000;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 24px;
+            max-width: 600px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            animation: slideUp 0.3s ease;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e5e7eb;
+            border-radius: 12px;
+            transition: all 0.3s;
+            font-size: 14px;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #8b5cf6;
+            box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 12px;
+            font-weight: 600;
+            transition: all 0.3s;
+            border: none;
+            cursor: pointer;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: #f3f4f6;
+            color: #374151;
+            padding: 12px 24px;
+            border-radius: 12px;
+            font-weight: 600;
+            transition: all 0.3s;
+            border: none;
+            cursor: pointer;
+        }
+
+        .btn-secondary:hover {
+            background: #e5e7eb;
+        }
+
+        .image-preview {
+            width: 100%;
+            height: 200px;
+            border: 2px dashed #d1d5db;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            position: relative;
+            background: #f9fafb;
+        }
+
+        .image-preview img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: cover;
+        }
+
+        .image-preview-placeholder {
+            text-align: center;
+            color: #9ca3af;
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-gray-50 via-gray-100 to-gray-200 min-h-screen">
+    <div class="flex h-screen overflow-hidden">
+        <!-- Premium Sidebar -->
+        <aside class="w-72 sidebar-premium text-white flex-shrink-0 shadow-2xl">
+            <div class="p-6">
+                <div class="flex items-center space-x-4 mb-10 p-4 bg-white/10 rounded-2xl backdrop-blur-sm">
+                    <div class="w-14 h-14 gradient-bg rounded-2xl flex items-center justify-center shadow-lg stat-icon">
+                        <i class="fas fa-coffee text-2xl text-white"></i>
+                    </div>
+                    <div>
+                        <h1 class="text-2xl font-bold tracking-wide">Cafe Manager</h1>
+                        <p class="text-xs text-gray-300">Premium Edition</p>
+                    </div>
+                </div>
+
+                <nav class="space-y-2">
+                    <a href="/Admin/Dashboard" class="menu-item active flex items-center space-x-4 px-5 py-4 rounded-xl">
+                        <i class="fas fa-chart-line w-6 text-lg"></i>
+                        <span class="font-medium">Dashboard</span>
+                    </a>
+                    
+                    <a href="/Admin/Orders" class="menu-item flex items-center space-x-4 px-5 py-4 rounded-xl">
+                        <i class="fas fa-shopping-cart w-6 text-lg"></i>
+                        <span class="font-medium">Đơn hàng</span>
+                        <span class="ml-auto bg-red-500 text-white text-xs px-2 py-1 rounded-full">@(ViewBag.PendingOrders ?? 0)</span>
+                    </a>
+                    
+                    <a href="/Admin/Products" class="menu-item flex items-center space-x-4 px-5 py-4 rounded-xl">
+                        <i class="fas fa-mug-hot w-6 text-lg"></i>
+                        <span class="font-medium">Sản phẩm</span>
+                    </a>
+                    
+                    <a href="/Admin/Reports" class="menu-item flex items-center space-x-4 px-5 py-4 rounded-xl">
+                        <i class="fas fa-chart-bar w-6 text-lg"></i>
+                        <span class="font-medium">Báo cáo</span>
+                    </a>
+                    
+                    <div class="pt-4 mt-4 border-t border-white/20">
+                        <a href="/Admin/Settings" class="menu-item flex items-center space-x-4 px-5 py-4 rounded-xl">
+                            <i class="fas fa-cog w-6 text-lg"></i>
+                            <span class="font-medium">Cài đặt</span>
+                        </a>
+                    </div>
+                </nav>
+
+                <div class="mt-8 p-4 bg-white/10 rounded-2xl backdrop-blur-sm">
+                    <div class="flex items-center space-x-3">
+                        <div class="w-10 h-10 gradient-bg rounded-full flex items-center justify-center">
+                            <span class="text-white font-bold">@fullName.Substring(0, 1).ToUpper()</span>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <p class="text-sm font-semibold truncate">@fullName</p>
+                            <p class="text-xs text-gray-300 truncate">@@username</p>
+                        </div>
+                        <div class="status-indicator w-3 h-3 bg-green-400 rounded-full"></div>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <div class="flex-1 flex flex-col overflow-hidden">
+            <!-- Premium Header -->
+            <header class="glass-effect shadow-xl z-10 border-b border-gray-200">
+                <div class="flex items-center justify-between px-8 py-5">
+                    <div>
+                        <h2 class="text-3xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
+                            Dashboard Overview
+                        </h2>
+                        <p class="text-gray-600 text-sm mt-2 flex items-center">
+                            <span class="w-2 h-2 bg-green-500 rounded-full mr-2 status-indicator"></span>
+                            Chào mừng trở lại, <strong class="ml-1">@fullName</strong>!
+                        </p>
+                    </div>
+                    
+                    <!-- User Menu with Working Dropdown -->
+                    <div class="relative">
+                        <button id="userMenuBtn" type="button" class="flex items-center space-x-4 px-5 py-3 rounded-2xl hover:bg-gray-100 transition-all duration-300 border border-gray-200">
+                            <div class="w-12 h-12 gradient-bg rounded-xl flex items-center justify-center shadow-lg">
+                                <span class="text-white font-bold text-lg">@fullName.Substring(0, 1).ToUpper()</span>
+                            </div>
+                            <div class="text-left">
+                                <p class="font-bold text-gray-800">@fullName</p>
+                                <p class="text-xs text-gray-500">@@username • Admin</p>
+                            </div>
+                            <i id="dropdownIcon" class="fas fa-chevron-down text-gray-400 transition-transform"></i>
+                        </button>
+                        
+                        <!-- Dropdown Menu -->
+                        <div id="dropdownMenu" class="dropdown-menu absolute right-0 mt-3 w-64 bg-white rounded-2xl shadow-2xl border border-gray-100 z-50">
+                            <div class="p-4 border-b border-gray-100 gradient-bg rounded-t-2xl">
+                                <p class="text-sm font-bold text-white">@fullName</p>
+                                <p class="text-xs text-white/80">@@username</p>
+                            </div>
+                            <div class="p-2">
+                                <a href="/Accounts/Profile" class="flex items-center space-x-3 px-4 py-3 text-sm text-gray-700 hover:bg-gray-50 rounded-xl transition">
+                                    <i class="fas fa-user text-purple-500 w-5"></i>
+                                    <span>Hồ sơ cá nhân</span>
+                                </a>
+                                <a href="/Accounts/ChangePassword" class="flex items-center space-x-3 px-4 py-3 text-sm text-gray-700 hover:bg-gray-50 rounded-xl transition">
+                                    <i class="fas fa-key text-blue-500 w-5"></i>
+                                    <span>Đổi mật khẩu</span>
+                                </a>
+                                <div class="border-t border-gray-100 my-2"></div>
+                                <a href="/Accounts/Logout" class="flex items-center space-x-3 px-4 py-3 text-sm text-red-600 hover:bg-red-50 rounded-xl transition">
+                                    <i class="fas fa-sign-out-alt w-5"></i>
+                                    <span>Đăng xuất</span>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Dashboard Content -->
+            <main class="flex-1 overflow-y-auto p-8">
+                <!-- Premium Stats Cards -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                    <!-- Revenue Card -->
+                    <div class="card-premium bg-white rounded-3xl shadow-xl p-6 border border-gray-100">
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="w-16 h-16 bg-gradient-to-br from-green-400 to-emerald-600 rounded-2xl flex items-center justify-center shadow-lg stat-icon">
+                                <i class="fas fa-dollar-sign text-white text-2xl"></i>
+                            </div>
+                            <div class="text-right">
+                                <span class="px-3 py-1 bg-green-100 text-green-700 text-xs font-bold rounded-full">+12.5%</span>
+                            </div>
+                        </div>
+                        <h3 class="text-gray-500 text-sm font-semibold mb-2 uppercase tracking-wide">Doanh thu hôm nay</h3>
+                        <p class="text-4xl font-bold bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent">
+                            @(ViewBag.TodayRevenue != null ? ViewBag.TodayRevenue.ToString("N0") : "0") đ
+                        </p>
+                        <div class="mt-4 h-1 bg-gray-200 rounded-full overflow-hidden">
+                            <div class="progress-bar h-full bg-gradient-to-r from-green-400 to-emerald-600 rounded-full" style="width: 75%"></div>
+                        </div>
+                    </div>
+
+                    <!-- Orders Card -->
+                    <div class="card-premium bg-white rounded-3xl shadow-xl p-6 border border-gray-100">
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="w-16 h-16 bg-gradient-to-br from-blue-400 to-blue-600 rounded-2xl flex items-center justify-center shadow-lg stat-icon">
+                                <i class="fas fa-shopping-bag text-white text-2xl"></i>
+                            </div>
+                            <div class="text-right">
+                                <span class="px-3 py-1 bg-blue-100 text-blue-700 text-xs font-bold rounded-full">+8.2%</span>
+                            </div>
+                        </div>
+                        <h3 class="text-gray-500 text-sm font-semibold mb-2 uppercase tracking-wide">Đơn hàng hôm nay</h3>
+                        <p class="text-4xl font-bold bg-gradient-to-r from-blue-600 to-blue-600 bg-clip-text text-transparent">
+                            @(ViewBag.TodayOrders ?? 0)
+                        </p>
+                        <div class="mt-4 h-1 bg-gray-200 rounded-full overflow-hidden">
+                            <div class="progress-bar h-full bg-gradient-to-r from-blue-400 to-blue-600 rounded-full" style="width: 60%"></div>
+                        </div>
+                    </div>
+
+                    <!-- Products Card -->
+                    <div class="card-premium bg-white rounded-3xl shadow-xl p-6 border border-gray-100">
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="w-16 h-16 bg-gradient-to-br from-purple-400 to-purple-600 rounded-2xl flex items-center justify-center shadow-lg stat-icon">
+                                <i class="fas fa-box text-white text-2xl"></i>
+                            </div>
+                            <div class="text-right">
+                                <span class="px-3 py-1 bg-purple-100 text-purple-700 text-xs font-bold rounded-full">
+                                    @(ViewBag.ActiveProducts ?? 0) hoạt động
+                                </span>
+                            </div>
+                        </div>
+                        <h3 class="text-gray-500 text-sm font-semibold mb-2 uppercase tracking-wide">Tổng sản phẩm</h3>
+                        <p class="text-4xl font-bold bg-gradient-to-r from-purple-600 to-purple-600 bg-clip-text text-transparent">
+                            @(ViewBag.TotalProducts ?? 0)
+                        </p>
+                        <div class="mt-4 h-1 bg-gray-200 rounded-full overflow-hidden">
+                            <div class="progress-bar h-full bg-gradient-to-r from-purple-400 to-purple-600 rounded-full" style="width: 85%"></div>
+                        </div>
+                    </div>
+
+                    <!-- Pending Orders Card -->
+                    <div class="card-premium bg-white rounded-3xl shadow-xl p-6 border border-gray-100">
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="w-16 h-16 bg-gradient-to-br from-orange-400 to-orange-600 rounded-2xl flex items-center justify-center shadow-lg stat-icon badge-pulse">
+                                <i class="fas fa-clock text-white text-2xl"></i>
+                            </div>
+                            <div class="text-right">
+                                <span class="px-3 py-1 bg-orange-100 text-orange-700 text-xs font-bold rounded-full">Cần xử lý</span>
+                            </div>
+                        </div>
+                        <h3 class="text-gray-500 text-sm font-semibold mb-2 uppercase tracking-wide">Đơn chờ xử lý</h3>
+                        <p class="text-4xl font-bold bg-gradient-to-r from-orange-600 to-orange-600 bg-clip-text text-transparent">
+                            @(ViewBag.PendingOrders ?? 0)
+                        </p>
+                        <div class="mt-4 h-1 bg-gray-200 rounded-full overflow-hidden">
+                            <div class="progress-bar h-full bg-gradient-to-r from-orange-400 to-orange-600 rounded-full" style="width: 45%"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Charts and Tables Section -->
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+                    <!-- Recent Orders Table -->
+                    <div class="lg:col-span-2 glass-effect rounded-3xl shadow-xl p-6 border border-gray-100">
+                        <div class="flex items-center justify-between mb-6">
+                            <h3 class="text-2xl font-bold text-gray-800 flex items-center">
+                                <span class="w-2 h-8 bg-gradient-to-b from-purple-600 to-pink-600 rounded-full mr-3"></span>
+                                Đơn hàng gần đây
+                            </h3>
+                            <a href="/Admin/Orders" class="px-4 py-2 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-xl text-sm font-semibold hover:shadow-lg transition-all duration-300">
+                                Xem tất cả →
+                            </a>
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="w-full">
+                                <thead>
+                                    <tr class="border-b-2 border-gray-200">
+                                        <th class="text-left py-4 px-4 text-xs font-bold text-gray-600 uppercase tracking-wider">Mã ĐH</th>
+                                        <th class="text-left py-4 px-4 text-xs font-bold text-gray-600 uppercase tracking-wider">Khách hàng</th>
+                                        <th class="text-left py-4 px-4 text-xs font-bold text-gray-600 uppercase tracking-wider">Tổng tiền</th>
+                                        <th class="text-left py-4 px-4 text-xs font-bold text-gray-600 uppercase tracking-wider">Trạng thái</th>
+                                        <th class="text-left py-4 px-4 text-xs font-bold text-gray-600 uppercase tracking-wider">Thời gian</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @if (ViewBag.RecentOrders != null && ((IEnumerable<dynamic>)ViewBag.RecentOrders).Any())
+                                    {
+                                        foreach (var order in ViewBag.RecentOrders)
+                                        {
+                                            <tr class="table-row border-b border-gray-100">
+                                                <td class="py-4 px-4">
+                                                    <span class="font-bold text-purple-600">#@order.Id</span>
+                                                </td>
+                                                <td class="py-4 px-4">
+                                                    <div class="flex items-center space-x-3">
+                                                        <div class="w-8 h-8 bg-gradient-to-br from-purple-400 to-pink-400 rounded-full flex items-center justify-center">
+                                                            <span class="text-white text-xs font-bold">@order.CustomerName.Substring(0, 1).ToUpper()</span>
+                                                        </div>
+                                                        <span class="font-medium text-gray-800">@order.CustomerName</span>
+                                                    </div>
+                                                </td>
+                                                <td class="py-4 px-4">
+                                                    <span class="font-bold text-gray-800">@order.Total.ToString("N0") đ</span>
+                                                </td>
+                                                <td class="py-4 px-4">
+                                                    @if (order.Status == "pending")
+                                                    {
+                                                        <span class="px-3 py-1.5 text-xs font-bold text-yellow-700 bg-yellow-100 rounded-full border border-yellow-200">
+                                                            <i class="fas fa-clock mr-1"></i>Chờ xử lý
+                                                        </span>
+                                                    }
+                                                    else if (order.Status == "processing")
+                                                    {
+                                                        <span class="px-3 py-1.5 text-xs font-bold text-blue-700 bg-blue-100 rounded-full border border-blue-200">
+                                                            <i class="fas fa-spinner mr-1"></i>Đang xử lý
+                                                        </span>
+                                                    }
+                                                    else if (order.Status == "done")
+                                                    {
+                                                        <span class="px-3 py-1.5 text-xs font-bold text-green-700 bg-green-100 rounded-full border border-green-200">
+                                                            <i class="fas fa-check mr-1"></i>Hoàn thành
+                                                        </span>
+                                                    }
+                                                    else
+                                                    {
+                                                        <span class="px-3 py-1.5 text-xs font-bold text-red-700 bg-red-100 rounded-full border border-red-200">
+                                                            <i class="fas fa-times mr-1"></i>Đã hủy
+                                                        </span>
+                                                    }
+                                                </td>
+                                                <td class="py-4 px-4 text-sm text-gray-500">
+                                                    <i class="far fa-clock mr-1"></i>@order.CreatedAt.ToString("HH:mm dd/MM")
+                                                </td>
+                                            </tr>
+                                        }
+                                    }
+                                    else
+                                    {
+                                        <tr>
+                                            <td colspan="5" class="py-12 text-center">
+                                                <i class="fas fa-inbox text-gray-300 text-4xl mb-3"></i>
+                                                <p class="text-gray-500">Chưa có đơn hàng nào</p>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Top Products -->
+                    <div class="glass-effect rounded-3xl shadow-xl p-6 border border-gray-100">
+                        <div class="flex items-center justify-between mb-6">
+                            <h3 class="text-xl font-bold text-gray-800">Sản phẩm bán chạy</h3>
+                            <div class="w-10 h-10 bg-gradient-to-br from-orange-400 to-red-500 rounded-xl flex items-center justify-center stat-icon">
+                                <i class="fas fa-fire text-white"></i>
+                            </div>
+                        </div>
+                        <div class="space-y-3">
+                            @if (ViewBag.TopProducts != null && ((IEnumerable<dynamic>)ViewBag.TopProducts).Any())
+                            {
+                                int rank = 1;
+                                foreach (var product in ViewBag.TopProducts)
+                                {
+                                    <div class="flex items-center space-x-4 p-4 rounded-2xl hover:bg-gradient-to-r hover:from-purple-50 hover:to-pink-50 transition-all duration-300 border border-gray-100">
+                                        <div class="w-12 h-12 bg-gradient-to-br from-purple-400 to-pink-500 rounded-xl flex items-center justify-center flex-shrink-0 shadow-lg">
+                                            <span class="text-white font-bold">@rank</span>
+                                        </div>
+                                        <div class="flex-1 min-w-0">
+                                            <p class="font-bold text-gray-800 truncate">@product.Name</p>
+                                            <p class="text-sm text-gray-500 font-semibold">@product.Price.ToString("N0") đ</p>
+                                        </div>
+                                        <div class="text-right">
+                                            <div class="px-3 py-1 bg-gradient-to-r from-purple-100 to-pink-100 rounded-full">
+                                                <span class="text-sm font-bold text-purple-600">@product.SoldCount</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    rank++;
+                                }
+                            }
+                            else
+                            {
+                                <div class="text-center py-12">
+                                    <i class="fas fa-chart-line text-gray-300 text-4xl mb-3"></i>
+                                    <p class="text-gray-500">Chưa có dữ liệu</p>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Premium Quick Actions -->
+                <div class="glass-effect rounded-3xl shadow-xl p-8 border border-gray-100">
+                    <h3 class="text-2xl font-bold text-gray-800 mb-6 flex items-center">
+                        <span class="w-2 h-8 bg-gradient-to-b from-purple-600 to-pink-600 rounded-full mr-3"></span>
+                        Thao tác nhanh
+                    </h3>
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
+                        <div class="quick-action group" onclick="openModal('createOrderModal')">
+                            <div class="flex flex-col items-center justify-center p-8 bg-gradient-to-br from-blue-50 to-blue-100 rounded-2xl hover:shadow-2xl transition-all duration-300 border-2 border-blue-200 hover:border-blue-400 cursor-pointer">
+                                <div class="w-16 h-16 bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl flex items-center justify-center mb-4 shadow-lg group-hover:scale-110 transition-transform">
+                                    <i class="fas fa-plus text-white text-2xl"></i>
+                                </div>
+                                <span class="font-bold text-gray-800 text-center">Tạo đơn mới</span>
+                                <span class="text-xs text-gray-500 mt-1">Thêm đơn hàng</span>
+                            </div>
+                        </div>
+                        
+                        <div class="quick-action group" onclick="openModal('addProductModal')">
+                            <div class="flex flex-col items-center justify-center p-8 bg-gradient-to-br from-purple-50 to-purple-100 rounded-2xl hover:shadow-2xl transition-all duration-300 border-2 border-purple-200 hover:border-purple-400 cursor-pointer">
+                                <div class="w-16 h-16 bg-gradient-to-br from-purple-500 to-purple-600 rounded-2xl flex items-center justify-center mb-4 shadow-lg group-hover:scale-110 transition-transform">
+                                    <i class="fas fa-box-open text-white text-2xl"></i>
+                                </div>
+                                <span class="font-bold text-gray-800 text-center">Thêm sản phẩm</span>
+                                <span class="text-xs text-gray-500 mt-1">Sản phẩm mới</span>
+                            </div>
+                        </div>
+                        
+                        <div class="quick-action group" onclick="window.location.href='/Admin/Reports'">
+                            <div class="flex flex-col items-center justify-center p-8 bg-gradient-to-br from-green-50 to-green-100 rounded-2xl hover:shadow-2xl transition-all duration-300 border-2 border-green-200 hover:border-green-400 cursor-pointer">
+                                <div class="w-16 h-16 bg-gradient-to-br from-green-500 to-green-600 rounded-2xl flex items-center justify-center mb-4 shadow-lg group-hover:scale-110 transition-transform">
+                                    <i class="fas fa-chart-line text-white text-2xl"></i>
+                                </div>
+                                <span class="font-bold text-gray-800 text-center">Xem báo cáo</span>
+                                <span class="text-xs text-gray-500 mt-1">Thống kê chi tiết</span>
+                            </div>
+                        </div>
+                        
+                        <div class="quick-action group" onclick="window.location.href='/Admin/Settings'">
+                            <div class="flex flex-col items-center justify-center p-8 bg-gradient-to-br from-orange-50 to-orange-100 rounded-2xl hover:shadow-2xl transition-all duration-300 border-2 border-orange-200 hover:border-orange-400 cursor-pointer">
+                                <div class="w-16 h-16 bg-gradient-to-br from-orange-500 to-orange-600 rounded-2xl flex items-center justify-center mb-4 shadow-lg group-hover:scale-110 transition-transform">
+                                    <i class="fas fa-cog text-white text-2xl"></i>
+                                </div>
+                                <span class="font-bold text-gray-800 text-center">Cài đặt</span>
+                                <span class="text-xs text-gray-500 mt-1">Cấu hình hệ thống</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- Modal: Create Order -->
+    <div id="createOrderModal" class="modal-overlay" onclick="closeModalOnOverlay(event, 'createOrderModal')">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <div class="p-6 border-b border-gray-200 gradient-bg">
+                <div class="flex items-center justify-between">
+                    <h3 class="text-2xl font-bold text-white flex items-center">
+                        <i class="fas fa-shopping-cart mr-3"></i>
+                        Tạo đơn hàng mới
+                    </h3>
+                    <button onclick="closeModal('createOrderModal')" class="text-white hover:bg-white/20 rounded-lg p-2 transition">
+                        <i class="fas fa-times text-xl"></i>
+                    </button>
+                </div>
+            </div>
+            <form id="createOrderForm" class="p-6">
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-bold text-gray-700 mb-2">Tên khách hàng</label>
+                        <input type="text" name="CustomerName" class="form-input" placeholder="Nhập tên khách hàng" required>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-bold text-gray-700 mb-2">Số điện thoại (tùy chọn)</label>
+                        <input type="tel" name="Phone" class="form-input" placeholder="0123456789">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-bold text-gray-700 mb-2">Sản phẩm</label>
+                        <select id="productSelect" name="ProductId" class="form-input" onchange="updateProductPrice()" required>
+                            <option value="">Chọn sản phẩm</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-bold text-gray-700 mb-2">Giá sản phẩm</label>
+                        <input type="text" id="productPrice" class="form-input" readonly placeholder="0 đ">
+                        <input type="hidden" id="priceValue" name="Price" value="0">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-bold text-gray-700 mb-2">Số lượng</label>
+                        <input type="number" id="quantity" name="Quantity" class="form-input" min="1" value="1" oninput="updateTotal()" required>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-bold text-gray-700 mb-2">Tổng tiền</label>
+                        <div class="text-2xl font-bold text-green-600" id="totalAmount">0 đ</div>
+                        <input type="hidden" id="totalValue" name="Total" value="0">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-bold text-gray-700 mb-2">Ghi chú</label>
+                        <textarea name="Note" class="form-input" rows="3" placeholder="Ghi chú thêm (tùy chọn)"></textarea>
+                    </div>
+                </div>
+                <input type="hidden" name="Status" value="pending">
+                <input type="hidden" name="CreatedBy" value="@userId">
+                <div class="flex space-x-3 mt-6">
+                    <button type="submit" class="btn-primary flex-1">
+                        <i class="fas fa-check mr-2"></i>
+                        Tạo đơn hàng
+                    </button>
+                    <button type="button" onclick="closeModal('createOrderModal')" class="btn-secondary">
+                        Hủy
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal: Add Product -->
+    <div id="addProductModal" class="modal-overlay" onclick="closeModalOnOverlay(event, 'addProductModal')">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <div class="p-6 border-b border-gray-200 gradient-bg">
+                <div class="flex items-center justify-between">
+                    <h3 class="text-2xl font-bold text-white flex items-center">
+                        <i class="fas fa-box-open mr-3"></i>
+                        Thêm sản phẩm mới
+                    </h3>
+                    <button onclick="closeModal('addProductModal')" class="text-white hover:bg-white/20 rounded-lg p-2 transition">
+                        <i class="fas fa-times text-xl"></i>
+                    </button>
+                </div>
+            </div>
+            <form id="addProductForm" class="p-6" enctype="multipart/form-data">
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-bold text-gray-700 mb-2">Hình ảnh sản phẩm</label>
+                        <div class="image-preview" id="imagePreview">
+                            <div class="image-preview-placeholder">
+                                <i class="fas fa-image text-4xl mb-2"></i>
+                                <p class="text-sm">Nhấn để chọn hình ảnh</p>
+                            </div>
+                        </div>
+                        <input type="file" id="productImage" name="ImageFile" accept="image/*" class="hidden" onchange="previewImage(event)">
+                        <button type="button" onclick="document.getElementById('productImage').click()" class="mt-2 btn-secondary w-full">
+                            <i class="fas fa-upload mr-2"></i>
+                            Chọn hình ảnh
+                        </button>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-bold text-gray-700 mb-2">Tên sản phẩm</label>
+                        <input type="text" name="Name" class="form-input" placeholder="Nhập tên sản phẩm" required>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-bold text-gray-700 mb-2">Danh mục</label>
+                        <select name="Category" class="form-input" required>
+                            <option value="">Chọn danh mục</option>
+                            <option value="Cà phê">Cà phê</option>
+                            <option value="Trà">Trà</option>
+                            <option value="Sinh tố">Sinh tố</option>
+                            <option value="Bánh">Bánh</option>
+                            <option value="Đồ uống">Đồ uống khác</option>
+                        </select>
+                    </div>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-bold text-gray-700 mb-2">Giá (đ)</label>
+                            <input type="number" name="Price" class="form-input" placeholder="0" min="1000" step="1000" required>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-bold text-gray-700 mb-2">Trạng thái</label>
+                            <select name="IsActive" class="form-input">
+                                <option value="true">Hoạt động</option>
+                                <option value="false">Tạm ngưng</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-bold text-gray-700 mb-2">Mô tả</label>
+                        <textarea name="Description" class="form-input" rows="3" placeholder="Mô tả sản phẩm"></textarea>
+                    </div>
+                </div>
+                <div class="flex space-x-3 mt-6">
+                    <button type="submit" class="btn-primary flex-1">
+                        <i class="fas fa-check mr-2"></i>
+                        Thêm sản phẩm
+                    </button>
+                    <button type="button" onclick="closeModal('addProductModal')" class="btn-secondary">
+                        Hủy
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+// ========== DROPDOWN MENU ==========
+const userMenuBtn = document.getElementById('userMenuBtn');
+const dropdownMenu = document.getElementById('dropdownMenu');
+const dropdownIcon = document.getElementById('dropdownIcon');
+
+userMenuBtn.addEventListener('click', (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    dropdownMenu.classList.toggle('show');
+    dropdownIcon.classList.toggle('fa-chevron-down');
+    dropdownIcon.classList.toggle('fa-chevron-up');
+});
+
+document.addEventListener('click', (e) => {
+    if (!userMenuBtn.contains(e.target) && !dropdownMenu.contains(e.target)) {
+        dropdownMenu.classList.remove('show');
+        dropdownIcon.classList.remove('fa-chevron-up');
+        dropdownIcon.classList.add('fa-chevron-down');
+    }
+});
+
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+        dropdownMenu.classList.remove('show');
+        dropdownIcon.classList.remove('fa-chevron-up');
+        dropdownIcon.classList.add('fa-chevron-down');
+        closeAllModals();
+    }
+});
+
+// ========== MODAL FUNCTIONS ==========
+function openModal(modalId) {
+    document.getElementById(modalId).classList.add('active');
+    document.body.style.overflow = 'hidden';
+    
+    if (modalId === 'createOrderModal') {
+        loadProducts();
+    }
+}
+
+function closeModal(modalId) {
+    document.getElementById(modalId).classList.remove('active');
+    document.body.style.overflow = 'auto';
+    
+    const form = document.querySelector(`#${modalId} form`);
+    if (form) {
+        form.reset();
+        if (modalId === 'createOrderModal') {
+            document.getElementById('productPrice').value = '';
+            document.getElementById('priceValue').value = '0';
+            document.getElementById('totalAmount').textContent = '0 đ';
+            document.getElementById('totalValue').value = '0';
+        }
+        if (modalId === 'addProductModal') {
+            document.getElementById('imagePreview').innerHTML = `
+                <div class="image-preview-placeholder">
+                    <i class="fas fa-image text-4xl mb-2"></i>
+                    <p class="text-sm">Nhấn để chọn hình ảnh</p>
+                </div>
+            `;
+        }
+    }
+}
+
+function closeModalOnOverlay(event, modalId) {
+    if (event.target.classList.contains('modal-overlay')) {
+        closeModal(modalId);
+    }
+}
+
+function closeAllModals() {
+    document.querySelectorAll('.modal-overlay').forEach(modal => {
+        modal.classList.remove('active');
+    });
+    document.body.style.overflow = 'auto';
+}
+
+// ========== SHOW NOTIFICATION ==========
+function showNotification(message, type = 'success') {
+    const bgColor = type === 'success' ? 'bg-green-500' : 'bg-red-500';
+    const icon = type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle';
+    
+    const notification = document.createElement('div');
+    notification.className = `fixed top-4 right-4 ${bgColor} text-white px-6 py-4 rounded-xl shadow-2xl z-50 flex items-center space-x-3`;
+    notification.style.animation = 'slideIn 0.3s ease';
+    notification.innerHTML = `
+        <i class="fas ${icon} text-xl"></i>
+        <span class="font-semibold">${message}</span>
+    `;
+    
+    document.body.appendChild(notification);
+    
+    setTimeout(() => {
+        notification.style.animation = 'slideOut 0.3s ease';
+        setTimeout(() => notification.remove(), 300);
+    }, 3000);
+}
+
+// ========== LOAD PRODUCTS ==========
+function loadProducts() {
+    const productSelect = document.getElementById('productSelect');
+    productSelect.innerHTML = '<option value="">Đang tải...</option>';
+    
+    console.log('🔍 Loading products from API...');
+    
+    fetch('/Admin/Products/GetAllActive')
+        .then(response => {
+            console.log('📡 Response status:', response.status);
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(products => {
+            console.log('✅ Loaded products:', products);
+            
+            if (!products || products.length === 0) {
+                productSelect.innerHTML = '<option value="">Không có sản phẩm nào</option>';
+                showNotification('Không có sản phẩm nào trong hệ thống!', 'error');
+                return;
+            }
+            
+            productSelect.innerHTML = '<option value="">Chọn sản phẩm</option>';
+            products.forEach(product => {
+                const option = document.createElement('option');
+                option.value = product.id;
+                option.textContent = `${product.name} - ${Number(product.price).toLocaleString('vi-VN')}đ`;
+                option.dataset.price = product.price;
+                productSelect.appendChild(option);
+            });
+            
+            console.log('✅ Products loaded successfully into dropdown');
+        })
+        .catch(error => {
+            console.error('❌ Error loading products:', error);
+            productSelect.innerHTML = '<option value="">Lỗi tải sản phẩm</option>';
+            showNotification('Không thể tải danh sách sản phẩm! ' + error.message, 'error');
+        });
+}
+
+// ========== UPDATE PRODUCT PRICE ==========
+function updateProductPrice() {
+    const select = document.getElementById('productSelect');
+    const selectedOption = select.options[select.selectedIndex];
+    const priceDisplay = document.getElementById('productPrice');
+    const priceValue = document.getElementById('priceValue');
+    
+    if (selectedOption && selectedOption.dataset.price) {
+        const price = parseFloat(selectedOption.dataset.price);
+        priceDisplay.value = price.toLocaleString('vi-VN') + ' đ';
+        priceValue.value = price;
+        document.getElementById('quantity').value = 1;
+        updateTotal();
+    } else {
+        priceDisplay.value = '';
+        priceValue.value = 0;
+        document.getElementById('quantity').value = 1;
+        document.getElementById('totalAmount').textContent = '0 đ';
+        document.getElementById('totalValue').value = 0;
+    }
+}
+
+// ========== UPDATE TOTAL ==========
+function updateTotal() {
+    const quantity = parseInt(document.getElementById('quantity').value) || 1;
+    const price = parseFloat(document.getElementById('priceValue').value) || 0;
+    const total = quantity * price;
+    
+    document.getElementById('totalAmount').textContent = total.toLocaleString('vi-VN') + ' đ';
+    document.getElementById('totalValue').value = total;
+}
+
+// ========== SUBMIT ORDER FORM ==========
+document.getElementById('createOrderForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    
+    console.log('📦 Submitting order form...');
+    
+    const customerName = document.querySelector('input[name="CustomerName"]').value.trim();
+    const productId = parseInt(document.getElementById('productSelect').value);
+    const quantity = parseInt(document.getElementById('quantity').value);
+    const price = parseFloat(document.getElementById('priceValue').value);
+    const phone = document.querySelector('input[name="Phone"]')?.value.trim() || '';
+    
+    if (!customerName) {
+        showNotification('Vui lòng nhập tên khách hàng!', 'error');
+        return;
+    }
+    
+    if (!productId || productId <= 0) {
+        showNotification('Vui lòng chọn sản phẩm!', 'error');
+        return;
+    }
+    
+    if (!quantity || quantity <= 0) {
+        showNotification('Số lượng phải lớn hơn 0!', 'error');
+        return;
+    }
+    
+    if (!price || price <= 0) {
+        showNotification('Giá sản phẩm không hợp lệ!', 'error');
+        return;
+    }
+    
+    const orderData = {
+        CustomerName: customerName,
+        Phone: phone,
+        ProductId: productId,
+        Quantity: quantity,
+        Price: price
+    };
+    
+    console.log('📤 Sending data:', orderData);
+    
+    const submitBtn = this.querySelector('button[type="submit"]');
+    const originalText = submitBtn.innerHTML;
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Đang tạo...';
+    
+    try {
+        const response = await fetch('/Admin/Orders/Create', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(orderData)
+        });
+        
+        const result = await response.json();
+        console.log('📥 Response:', result);
+        
+        if (result.success) {
+            showNotification(result.message || 'Tạo đơn hàng thành công!', 'success');
+            closeModal('createOrderModal');
+            
+            setTimeout(() => {
+                window.location.reload();
+            }, 1000);
+        } else {
+            showNotification(result.message || 'Có lỗi xảy ra!', 'error');
+        }
+    } catch (error) {
+        console.error('❌ Error:', error);
+        showNotification('Lỗi kết nối! Vui lòng thử lại.', 'error');
+    } finally {
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = originalText;
+    }
+});
+
+// ========== SUBMIT PRODUCT FORM ==========
+document.getElementById('addProductForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    
+    console.log('📦 Submitting product form...');
+    
+    const name = document.querySelector('input[name="Name"]').value.trim();
+    const category = document.querySelector('select[name="Category"]').value;
+    const priceInput = document.querySelector('input[name="Price"]');
+    const price = parseFloat(priceInput.value);
+    
+    if (!name) {
+        showNotification('Vui lòng nhập tên sản phẩm!', 'error');
+        return;
+    }
+    
+    if (!category) {
+        showNotification('Vui lòng chọn danh mục!', 'error');
+        return;
+    }
+    
+    if (!price || price <= 0) {
+        showNotification('Giá phải lớn hơn 0!', 'error');
+        priceInput.focus();
+        return;
+    }
+    
+    if (price < 1000) {
+        showNotification('Giá phải ít nhất 1,000đ!', 'error');
+        priceInput.focus();
+        return;
+    }
+    
+    const formData = new FormData(this);
+    
+    console.log('📤 Sending product data...');
+    
+    const submitBtn = this.querySelector('button[type="submit"]');
+    const originalText = submitBtn.innerHTML;
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Đang thêm...';
+    
+    try {
+        const response = await fetch('/Admin/Products/Create', {
+            method: 'POST',
+            body: formData
+        });
+        
+        const result = await response.json();
+        console.log('📥 Response:', result);
+        
+        if (result.success) {
+            showNotification(result.message || 'Thêm sản phẩm thành công!', 'success');
+            closeModal('addProductModal');
+            
+            setTimeout(() => {
+                window.location.reload();
+            }, 1000);
+        } else {
+            showNotification(result.message || 'Có lỗi xảy ra!', 'error');
+        }
+    } catch (error) {
+        console.error('❌ Error:', error);
+        showNotification('Lỗi kết nối! Vui lòng thử lại.', 'error');
+    } finally {
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = originalText;
+    }
+});
+
+// ========== PREVIEW IMAGE ==========
+function previewImage(event) {
+    const preview = document.getElementById('imagePreview');
+    const file = event.target.files[0];
+    
+    if (file) {
+        if (file.size > 5 * 1024 * 1024) {
+            showNotification('File quá lớn! Kích thước tối đa 5MB', 'error');
+            event.target.value = '';
+            return;
+        }
+        
+        const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
+        if (!allowedTypes.includes(file.type)) {
+            showNotification('Chỉ chấp nhận file ảnh (jpg, png, gif, webp)', 'error');
+            event.target.value = '';
+            return;
+        }
+        
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            preview.innerHTML = `<img src="${e.target.result}" alt="Preview">`;
+        }
+        reader.readAsDataURL(file);
+    }
+}
+
+// ========== ANIMATE PROGRESS BARS ==========
+window.addEventListener('load', () => {
+    const progressBars = document.querySelectorAll('.progress-bar');
+    progressBars.forEach((bar, index) => {
+        setTimeout(() => {
+            const width = bar.style.width;
+            bar.style.width = '0%';
+            setTimeout(() => {
+                bar.style.width = width;
+            }, 50);
+        }, index * 100);
+    });
+});
+
+// ========== AUTO REFRESH STATS ==========
+setInterval(async () => {
+    try {
+        const response = await fetch('/Admin/api/stats?period=today');
+        const data = await response.json();
+        if (data.success && data.orders !== undefined) {
+            const badge = document.querySelector('.menu-item span.bg-red-500');
+            if (badge && data.orders > 0) {
+                badge.textContent = data.orders;
+            }
+        }
+    } catch (error) {
+        console.error('Error refreshing stats:', error);
+    }
+}, 30000);
+
+console.log('✅ Dashboard JavaScript loaded successfully!');
+    </script>
+</body>
+</html>

@@ -1,0 +1,257 @@
+@{
+    ViewData["Title"] = "Trang chủ người dùng";
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewData["Title"] - CafeWeb</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            background: white;
+            border-radius: 16px;
+            padding: 30px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header h1 {
+            font-size: 28px;
+            color: #1e293b;
+            margin-bottom: 5px;
+        }
+
+        .header p {
+            color: #64748b;
+            font-size: 14px;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 20px;
+            font-weight: 600;
+        }
+
+        .user-details h3 {
+            font-size: 16px;
+            color: #1e293b;
+            margin-bottom: 3px;
+        }
+
+        .user-details p {
+            font-size: 13px;
+            color: #64748b;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 12px;
+            background: #dbeafe;
+            color: #1e40af;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+            margin-left: 10px;
+        }
+
+        .content {
+            background: white;
+            border-radius: 16px;
+            padding: 40px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            min-height: 400px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .content h2 {
+            font-size: 32px;
+            color: #1e293b;
+            margin-bottom: 15px;
+        }
+
+        .content p {
+            font-size: 16px;
+            color: #64748b;
+            margin-bottom: 30px;
+            max-width: 600px;
+        }
+
+        .icon {
+            font-size: 80px;
+            margin-bottom: 20px;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 12px 30px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            text-decoration: none;
+            border-radius: 10px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+            font-size: 15px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: #f1f5f9;
+            color: #475569;
+            margin-left: 10px;
+        }
+
+        .btn-secondary:hover {
+            background: #e2e8f0;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-top: 30px;
+        }
+
+        .feature-card {
+            background: #f8fafc;
+            padding: 25px;
+            border-radius: 12px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .feature-card:hover {
+            background: #f1f5f9;
+            transform: translateY(-3px);
+        }
+
+        .feature-card .icon {
+            font-size: 40px;
+            margin-bottom: 10px;
+        }
+
+        .feature-card h3 {
+            font-size: 18px;
+            color: #1e293b;
+            margin-bottom: 8px;
+        }
+
+        .feature-card p {
+            font-size: 14px;
+            color: #64748b;
+            margin: 0;
+        }
+
+        @@media (max-width: 768px) {
+            .header {
+                flex-direction: column;
+                text-align: center;
+                gap: 20px;
+            }
+
+            .content {
+                padding: 30px 20px;
+            }
+
+            .features {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div>
+                <h1>☕ Chào mừng đến với CafeWeb</h1>
+                <p>Hệ thống quản lý quán cafe hiện đại</p>
+            </div>
+            <div class="user-info">
+                <div class="avatar">
+                    @(ViewBag.FullName != null ? ViewBag.FullName.Substring(0, 1).ToUpper() : "U")
+                </div>
+                <div class="user-details">
+                    <h3>@ViewBag.FullName <span class="badge">@ViewBag.Role</span></h3>
+                    <p>@@@ViewBag.Username</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="content">
+            <div class="icon">🎉</div>
+            <h2>Đăng ký thành công!</h2>
+            <p>Tài khoản của bạn đã được tạo thành công. Bạn có thể bắt đầu sử dụng các tính năng của hệ thống CafeWeb.</p>
+            
+            <div>
+                <a href="/Accounts/Logout" class="btn btn-secondary">Đăng xuất</a>
+            </div>
+
+            <div class="features">
+                <div class="feature-card">
+                    <div class="icon">📋</div>
+                    <h3>Xem Menu</h3>
+                    <p>Duyệt qua menu đồ uống và món ăn</p>
+                </div>
+                <div class="feature-card">
+                    <div class="icon">🛒</div>
+                    <h3>Đặt hàng</h3>
+                    <p>Đặt hàng trực tuyến nhanh chóng</p>
+                </div>
+                <div class="feature-card">
+                    <div class="icon">📜</div>
+                    <h3>Lịch sử</h3>
+                    <p>Xem lại các đơn hàng đã đặt</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
