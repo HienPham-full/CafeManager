@@ -36,5 +36,7 @@ namespace CafeWeb.Models
 
         [ForeignKey("ProductId")]
         public Product Product { get; set; } = null!;
+    
+
     }
 }
