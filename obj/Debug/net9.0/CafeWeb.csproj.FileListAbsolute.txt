@@ -210,6 +210,4 @@ D:\AspNet\CafeWeb\bin\Debug\net9.0\runtimes\win-x64\native\k5sprt64.dll
 D:\AspNet\CafeWeb\bin\Debug\net9.0\runtimes\win-x64\native\krb5_64.dll
 D:\AspNet\CafeWeb\bin\Debug\net9.0\runtimes\win-x64\native\krbcc64.dll
 D:\AspNet\CafeWeb\bin\Debug\net9.0\runtimes\win\lib\net8.0\System.Windows.Extensions.dll
-D:\AspNet\CafeWeb\bin\Debug\net9.0\package-lock.json
-D:\AspNet\CafeWeb\bin\Debug\net9.0\package.json
 D:\AspNet\CafeWeb\obj\Debug\net9.0\CafeWeb.sourcelink.json
