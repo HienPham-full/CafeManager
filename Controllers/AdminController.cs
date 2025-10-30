@@ -433,41 +433,12 @@ namespace CafeWeb.Controllers
         // PAGES - Các trang khác
         // ========================================
 
-        [HttpGet("Reports")]
-        public async Task<IActionResult> Reports()
-        {
-            if (!CheckAuth())
-            {
-                TempData["Error"] = "Vui lòng đăng nhập để tiếp tục!";
-                return RedirectToAction("Login", "Accounts");
-            }
-
-            try
-            {
-                var today = DateTime.Today;
-                var last7Days = today.AddDays(-7);
-                var last30Days = today.AddDays(-30);
-
-                ViewBag.PendingOrders = await _context.Orders
-                    .CountAsync(o => o.Status == "pending");
-
-                ViewBag.Last7DaysRevenue = await _context.Payments
-                    .Where(p => p.PaidAt >= last7Days)
-                    .SumAsync(p => (decimal?)p.Amount) ?? 0;
-
-                ViewBag.Last30DaysRevenue = await _context.Payments
-                    .Where(p => p.PaidAt >= last30Days)
-                    .SumAsync(p => (decimal?)p.Amount) ?? 0;
-
-                return View();
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"❌ Error in Reports: {ex.Message}");
-                TempData["Error"] = "Đã có lỗi xảy ra!";
-                return View();
-            }
-        }
+        // ❌ XÓA ACTION NÀY - Đã có ReportsController riêng
+        // [HttpGet("Reports")]
+        // public async Task<IActionResult> Reports()
+        // {
+        //     ... code cũ ...
+        // }
 
         [HttpGet("Settings")]
         public async Task<IActionResult> Settings()
