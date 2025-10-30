@@ -1,5 +1,5 @@
 @{
-    ViewData["Title"] = "Trang chủ người dùng";
+    ViewData["Title"] = "Menu";
     Layout = null;
 }
 
@@ -9,7 +9,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@ViewData["Title"] - CafeWeb</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
     <style>
         * {
             margin: 0;
@@ -19,239 +19,412 @@
 
         body {
             font-family: 'Inter', sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
             min-height: 100vh;
-            padding: 20px;
+            padding: 0;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                radial-gradient(circle at 20% 50%, rgba(186, 133, 84, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(218, 165, 32, 0.1) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: 1;
         }
 
         .container {
-            max-width: 1200px;
+            max-width: 1400px;
             margin: 0 auto;
+            padding: 0 20px;
+            position: relative;
+            z-index: 2;
         }
 
         .header {
-            background: white;
-            border-radius: 16px;
-            padding: 30px;
-            margin-bottom: 20px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+            padding: 40px 0;
+            text-align: center;
+            margin-bottom: 50px;
+            position: relative;
+        }
+
+        .header::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100px;
+            height: 3px;
+            background: linear-gradient(90deg, transparent, #daa520, transparent);
         }
 
         .header h1 {
-            font-size: 28px;
-            color: #1e293b;
-            margin-bottom: 5px;
+            font-family: 'Playfair Display', serif;
+            font-size: 56px;
+            font-weight: 700;
+            background: linear-gradient(135deg, #daa520 0%, #ffd700 50%, #daa520 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 15px;
+            letter-spacing: 2px;
+            text-shadow: 0 0 30px rgba(218, 165, 32, 0.3);
         }
 
         .header p {
-            color: #64748b;
-            font-size: 14px;
+            color: #b8b8d1;
+            font-size: 18px;
+            font-weight: 300;
+            letter-spacing: 3px;
+            text-transform: uppercase;
         }
 
-        .user-info {
+        .category-filter {
             display: flex;
-            align-items: center;
+            justify-content: center;
             gap: 15px;
+            margin-bottom: 50px;
+            flex-wrap: wrap;
         }
 
-        .avatar {
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-size: 20px;
-            font-weight: 600;
-        }
-
-        .user-details h3 {
-            font-size: 16px;
-            color: #1e293b;
-            margin-bottom: 3px;
-        }
-
-        .user-details p {
-            font-size: 13px;
-            color: #64748b;
-        }
-
-        .badge {
-            display: inline-block;
-            padding: 4px 12px;
-            background: #dbeafe;
-            color: #1e40af;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: 500;
-            margin-left: 10px;
-        }
-
-        .content {
-            background: white;
-            border-radius: 16px;
-            padding: 40px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-            text-align: center;
-            min-height: 400px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .content h2 {
-            font-size: 32px;
-            color: #1e293b;
-            margin-bottom: 15px;
-        }
-
-        .content p {
-            font-size: 16px;
-            color: #64748b;
-            margin-bottom: 30px;
-            max-width: 600px;
-        }
-
-        .icon {
-            font-size: 80px;
-            margin-bottom: 20px;
-        }
-
-        .btn {
-            display: inline-block;
+        .category-btn {
             padding: 12px 30px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            text-decoration: none;
-            border-radius: 10px;
-            font-weight: 600;
-            transition: all 0.3s ease;
-            border: none;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(218, 165, 32, 0.3);
+            color: #daa520;
+            border-radius: 30px;
             cursor: pointer;
-            font-size: 15px;
-        }
-
-        .btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
-        }
-
-        .btn-secondary {
-            background: #f1f5f9;
-            color: #475569;
-            margin-left: 10px;
-        }
-
-        .btn-secondary:hover {
-            background: #e2e8f0;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-        }
-
-        .features {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 20px;
-            margin-top: 30px;
-        }
-
-        .feature-card {
-            background: #f8fafc;
-            padding: 25px;
-            border-radius: 12px;
-            text-align: center;
+            font-size: 14px;
+            font-weight: 500;
+            letter-spacing: 1px;
             transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
         }
 
-        .feature-card:hover {
-            background: #f1f5f9;
-            transform: translateY(-3px);
+        .category-btn:hover,
+        .category-btn.active {
+            background: linear-gradient(135deg, #daa520 0%, #ffd700 100%);
+            color: #1a1a2e;
+            border-color: #ffd700;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(218, 165, 32, 0.4);
         }
 
-        .feature-card .icon {
-            font-size: 40px;
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 30px;
+            margin-bottom: 60px;
+        }
+
+        .product-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(218, 165, 32, 0.2);
+            border-radius: 20px;
+            overflow: hidden;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            backdrop-filter: blur(10px);
+            position: relative;
+        }
+
+        .product-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(218, 165, 32, 0.1) 0%, transparent 100%);
+            opacity: 0;
+            transition: opacity 0.4s ease;
+            pointer-events: none;
+        }
+
+        .product-card:hover {
+            transform: translateY(-10px);
+            border-color: rgba(218, 165, 32, 0.6);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4), 0 0 30px rgba(218, 165, 32, 0.2);
+        }
+
+        .product-card:hover::before {
+            opacity: 1;
+        }
+
+        .product-image {
+            width: 100%;
+            height: 250px;
+            object-fit: cover;
+            transition: transform 0.5s ease;
+        }
+
+        .product-card:hover .product-image {
+            transform: scale(1.1);
+        }
+
+        .product-image-wrapper {
+            overflow: hidden;
+            background: linear-gradient(135deg, #2c2c3e 0%, #1a1a2e 100%);
+            position: relative;
+        }
+
+        .product-status {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            padding: 6px 16px;
+            background: rgba(218, 165, 32, 0.9);
+            color: #1a1a2e;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            backdrop-filter: blur(10px);
+        }
+
+        .product-status.inactive {
+            background: rgba(150, 150, 150, 0.9);
+        }
+
+        .product-info {
+            padding: 25px;
+        }
+
+        .product-category {
+            color: #daa520;
+            font-size: 12px;
+            font-weight: 600;
+            letter-spacing: 2px;
+            text-transform: uppercase;
             margin-bottom: 10px;
         }
 
-        .feature-card h3 {
-            font-size: 18px;
-            color: #1e293b;
-            margin-bottom: 8px;
+        .product-name {
+            font-family: 'Playfair Display', serif;
+            font-size: 24px;
+            font-weight: 600;
+            color: #ffffff;
+            margin-bottom: 12px;
+            line-height: 1.3;
         }
 
-        .feature-card p {
+        .product-description {
+            color: #b8b8d1;
             font-size: 14px;
-            color: #64748b;
-            margin: 0;
+            line-height: 1.6;
+            margin-bottom: 20px;
+            min-height: 40px;
+        }
+
+        .product-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 20px;
+            border-top: 1px solid rgba(218, 165, 32, 0.2);
+        }
+
+        .product-price {
+            font-family: 'Playfair Display', serif;
+            font-size: 28px;
+            font-weight: 700;
+            background: linear-gradient(135deg, #daa520 0%, #ffd700 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .product-price-label {
+            font-size: 12px;
+            color: #b8b8d1;
+            font-weight: 400;
+        }
+
+        .no-products {
+            text-align: center;
+            padding: 80px 20px;
+            color: #b8b8d1;
+        }
+
+        .no-products-icon {
+            font-size: 80px;
+            margin-bottom: 20px;
+            opacity: 0.3;
+        }
+
+        .no-products h3 {
+            font-family: 'Playfair Display', serif;
+            font-size: 28px;
+            color: #daa520;
+            margin-bottom: 10px;
+        }
+
+        .no-products p {
+            font-size: 16px;
+        }
+
+        .back-button {
+            position: fixed;
+            top: 30px;
+            left: 30px;
+            padding: 12px 24px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(218, 165, 32, 0.3);
+            color: #daa520;
+            text-decoration: none;
+            border-radius: 30px;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+            z-index: 10;
+        }
+
+        .back-button:hover {
+            background: linear-gradient(135deg, #daa520 0%, #ffd700 100%);
+            color: #1a1a2e;
+            border-color: #ffd700;
+            transform: translateX(-5px);
+            box-shadow: 0 5px 20px rgba(218, 165, 32, 0.4);
         }
 
         @@media (max-width: 768px) {
-            .header {
-                flex-direction: column;
-                text-align: center;
+            .header h1 {
+                font-size: 36px;
+            }
+
+            .products-grid {
+                grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
                 gap: 20px;
             }
 
-            .content {
-                padding: 30px 20px;
+            .product-name {
+                font-size: 20px;
             }
 
-            .features {
-                grid-template-columns: 1fr;
+            .product-price {
+                font-size: 24px;
+            }
+
+            .back-button {
+                top: 15px;
+                left: 15px;
+                padding: 10px 20px;
+                font-size: 13px;
             }
         }
     </style>
 </head>
 <body>
+    <a href="/Home/UserIndex" class="back-button">← Quay lại</a>
+
     <div class="container">
         <div class="header">
-            <div>
-                <h1>☕ Chào mừng đến với CafeWeb</h1>
-                <p>Hệ thống quản lý quán cafe hiện đại</p>
-            </div>
-            <div class="user-info">
-                <div class="avatar">
-                    @(ViewBag.FullName != null ? ViewBag.FullName.Substring(0, 1).ToUpper() : "U")
-                </div>
-                <div class="user-details">
-                    <h3>@ViewBag.FullName <span class="badge">@ViewBag.Role</span></h3>
-                    <p>@@@ViewBag.Username</p>
-                </div>
-            </div>
+            <h1>☕ MENU</h1>
+            <p>Thực đơn cao cấp</p>
         </div>
 
-        <div class="content">
-            <div class="icon">🎉</div>
-            <h2>Đăng ký thành công!</h2>
-            <p>Tài khoản của bạn đã được tạo thành công. Bạn có thể bắt đầu sử dụng các tính năng của hệ thống CafeWeb.</p>
-            
-            <div>
-                <a href="/Accounts/Logout" class="btn btn-secondary">Đăng xuất</a>
-            </div>
+        <div class="category-filter">
+            <button class="category-btn active" onclick="filterCategory('all')">Tất cả</button>
+            <button class="category-btn" onclick="filterCategory('Cà phê')">Cà phê</button>
+            <button class="category-btn" onclick="filterCategory('Trà')">Trà</button>
+            <button class="category-btn" onclick="filterCategory('Bánh')">Bánh</button>
+            <button class="category-btn" onclick="filterCategory('Sinh tố')">Sinh tố</button>
+        </div>
 
-            <div class="features">
-                <div class="feature-card">
-                    <div class="icon">📋</div>
-                    <h3>Xem Menu</h3>
-                    <p>Duyệt qua menu đồ uống và món ăn</p>
+        <div class="products-grid" id="productsGrid">
+            @if (Model != null && Model.Any())
+            {
+                foreach (var product in Model)
+                {
+                    <div class="product-card" data-category="@product.Category">
+                        <div class="product-image-wrapper">
+                            @if (!string.IsNullOrEmpty(product.Image))
+                            {
+                                <img src="@product.Image" alt="@product.Name" class="product-image">
+                            }
+                            else
+                            {
+                                <img src="/uploads/products/default.png" alt="@product.Name" class="product-image">
+                            }
+                            <span class="product-status @(product.IsActive ? "" : "inactive")">
+                                @(product.IsActive ? "Còn hàng" : "Hết hàng")
+                            </span>
+                        </div>
+                        <div class="product-info">
+                            <div class="product-category">@product.Category</div>
+                            <h3 class="product-name">@product.Name</h3>
+                            <p class="product-description">
+                                @(string.IsNullOrEmpty(product.Description) ? "Sản phẩm chất lượng cao, được chế biến tỉ mỉ." : product.Description)
+                            </p>
+                            <div class="product-footer">
+                                <div>
+                                    <div class="product-price-label">Giá</div>
+                                    <div class="product-price">@product.Price.ToString("N0")₫</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+            }
+            else
+            {
+                <div class="no-products">
+                    <div class="no-products-icon">☕</div>
+                    <h3>Chưa có sản phẩm</h3>
+                    <p>Vui lòng quay lại sau</p>
                 </div>
-                <div class="feature-card">
-                    <div class="icon">🛒</div>
-                    <h3>Đặt hàng</h3>
-                    <p>Đặt hàng trực tuyến nhanh chóng</p>
-                </div>
-                <div class="feature-card">
-                    <div class="icon">📜</div>
-                    <h3>Lịch sử</h3>
-                    <p>Xem lại các đơn hàng đã đặt</p>
-                </div>
-            </div>
+            }
         </div>
     </div>
+
+    <script>
+        function filterCategory(category) {
+            const buttons = document.querySelectorAll('.category-btn');
+            const products = document.querySelectorAll('.product-card');
+            
+            buttons.forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            products.forEach(product => {
+                if (category === 'all' || product.dataset.category === category) {
+                    product.style.display = 'block';
+                    setTimeout(() => {
+                        product.style.opacity = '1';
+                        product.style.transform = 'translateY(0)';
+                    }, 10);
+                } else {
+                    product.style.opacity = '0';
+                    product.style.transform = 'translateY(20px)';
+                    setTimeout(() => {
+                        product.style.display = 'none';
+                    }, 300);
+                }
+            });
+        }
+
+        document.querySelectorAll('.product-card').forEach(card => {
+            card.style.opacity = '0';
+            card.style.transform = 'translateY(20px)';
+        });
+
+        window.addEventListener('load', () => {
+            document.querySelectorAll('.product-card').forEach((card, index) => {
+                setTimeout(() => {
+                    card.style.transition = 'all 0.5s ease';
+                    card.style.opacity = '1';
+                    card.style.transform = 'translateY(0)';
+                }, index * 100);
+            });
+        });
+    </script>
 </body>
 </html>
